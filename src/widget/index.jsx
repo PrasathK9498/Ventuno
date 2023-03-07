@@ -6,7 +6,8 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { Grid } from '@mui/material';
 import Cards from '../cards';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import data from '../data.json'
 
 const useStyles = makeStyles((Theme) => ({
     root:{
@@ -54,6 +55,15 @@ const useStyles = makeStyles((Theme) => ({
 const Widget = () => {
     const classes = useStyles();
     const [page, setPage] = useState(1);
+    const [cardData, setCardData] = useState([])
+    const [previousData, setPreviousData] = useState(false)
+    const [nextData, setNextData] = useState(false)
+
+    useEffect(() => {
+        page === 1 ? setPreviousData(false) : setPreviousData(data.slice(((page-1)*10)-10, (page-1)*10).length > 0)
+        setCardData(data.slice((page*10)-10, page*10));
+        setNextData(data.slice(((page+1)*10)-10, (page+1)*10).length > 0);
+    }, [page])
 
     return (
         <div>
@@ -67,7 +77,7 @@ const Widget = () => {
                 </Button>
             </div>
             <div className={classes.contentDiv}>
-                <ArrowBackIosIcon className={page === 1 ? classes.disableNext : classes.nextBtn} onClick={()=>{setPage(page-1)}}/>
+                <ArrowBackIosIcon className={!previousData ? classes.disableNext : classes.nextBtn} onClick={()=>{setPage(page-1)}}/>
                 <div style={{ display: 'flex' }}>
                     <Grid container className={classes.infoGrid}>
                         <div style={{ backgroundColor: 'black', height: '150px', width: '100%' }}></div>
@@ -83,9 +93,9 @@ const Widget = () => {
                             </Button>
                         </Grid>
                     </Grid>
-                    <Cards page={page}/>
+                    <Cards cardData={cardData}/>
                 </div>
-                <ArrowForwardIosIcon className={page === 2 ? classes.disableNext : classes.nextBtn} onClick={()=>{setPage(page+1)}}/>
+                <ArrowForwardIosIcon className={!nextData ? classes.disableNext : classes.nextBtn} onClick={()=>{setPage(page+1)}}/>
             </div>
         </div>
     )
